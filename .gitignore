@@ -1,0 +1,7 @@
+
+*.pgm
+*.png
+*.jpg
+photometric/photometrics_images/yaleB02/WS_FTP.LOG
+photometric/photometrics_images/yaleB02/yaleB02_P00.info
+*.pyc
