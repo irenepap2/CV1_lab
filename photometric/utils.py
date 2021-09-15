@@ -5,7 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def load_syn_images(image_dir='./lab1/photometric/photometrics_images/SphereGray3/', channel=1):
+def load_syn_images(image_dir='./lab1/photometric/photometrics_images/SphereGray3/', channel=0):
     files = os.listdir(image_dir)
     #files = [os.path.join(image_dir, f) for f in files]
     nfiles = len(files)
@@ -81,7 +81,7 @@ def load_face_images(image_dir='./yaleB02/'):
     
 def show_results(albedo, normals, height_map, SE):
     # Stride in the plot, you may want to adjust it to different images
-    stride = 1
+    stride = 8
     
     # showing albedo map
     fig = plt.figure()
@@ -108,14 +108,20 @@ def show_results(albedo, normals, height_map, SE):
     np.arange(1))
     X = X[..., 0]
     Y = Y[..., 0]
-    Z = height_map
+    Z = height_map[::stride,::stride]
+    print(X.shape)
+    print(Y.shape)
+    print(Z.shape)
     '''
     =============
     You could further inspect the shape of the objects and normal directions by using plt.quiver() function.  
     =============
     '''
     fig = plt.figure().add_subplot(projection='3d')
-    plt.quiver(X, Y, Z, normals[..., 0], normals[..., 1], normals[..., 2], length=0.1, normalize=True)
+    U = normals[::stride,::stride, 0]
+    V = normals[::stride,::stride, 1]
+    W = normals[::stride,::stride, 2]
+    plt.quiver(X, Y, Z, U, V, W, length=0.1, normalize=True)
     plt.show()
 
     # plotting the SE

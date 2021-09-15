@@ -58,5 +58,5 @@ def photometric_stereo_face(image_dir='./yaleB02/'):
     show_results(albedo, normals, height_map, SE)
     
 if __name__ == '__main__':
-    photometric_stereo('./lab1/photometric/photometrics_images/SphereColor/')
+    photometric_stereo('./photometric/photometrics_images/SphereGray25/')
     # photometric_stereo_face()
