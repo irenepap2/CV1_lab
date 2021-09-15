@@ -18,7 +18,7 @@ def load_syn_images(image_dir='./lab1/photometric/photometrics_images/SphereGray
         # read input image
         im = cv2.imread(os.path.join(image_dir, files[i]))
         im = im[:,:,channel]
-        
+
         # stack at third dimension
         if image_stack is None:
             h, w = im.shape
@@ -109,9 +109,6 @@ def show_results(albedo, normals, height_map, SE):
     X = X[..., 0]
     Y = Y[..., 0]
     Z = height_map[::stride,::stride]
-    print(X.shape)
-    print(Y.shape)
-    print(Z.shape)
     '''
     =============
     You could further inspect the shape of the objects and normal directions by using plt.quiver() function.  
@@ -133,6 +130,53 @@ def show_results(albedo, normals, height_map, SE):
     
     # plotting model geometry
     H = height_map[::stride,::stride]
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X,Y, H.T)
+    plt.show()
+
+def show_results_RGB(albedo, normals, height_map, SE):
+    # Stride in the plot, you may want to adjust it to different images
+    stride = 2
+    
+    # showing albedo map
+    fig = plt.figure()
+    print(albedo.shape)
+    albedo = albedo[:, :, ::-1]
+    plt.imshow(albedo)
+    plt.show()
+    
+    # showing normals as three separate channels
+    print(normals.shape)
+    normals_avg = np.nanmean(normals, axis = 2)
+    figure = plt.figure()
+    ax1 = figure.add_subplot(131)
+    ax1.imshow(normals_avg[..., 0])
+    ax2 = figure.add_subplot(132)
+    ax2.imshow(normals_avg[..., 1])
+    ax3 = figure.add_subplot(133)
+    ax3.imshow(normals_avg[..., 2])
+    plt.show()
+    
+    # meshgrid
+    X, Y, _ = np.meshgrid(np.arange(0,np.shape(normals_avg)[0], stride),
+    np.arange(0,np.shape(normals_avg)[1], stride),
+    np.arange(1))
+    X = X[..., 0]
+    Y = Y[..., 0]
+    height_map_avg = np.nanmean(height_map, axis = 2)
+    Z = height_map_avg[::stride,::stride]
+
+    # plotting the SE
+    SE_avr = np.nanmean(SE, axis = 2)
+    H = SE_avr[::stride,::stride]
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(X,Y, H.T)
+    plt.show()
+    
+    # # plotting model geometry
+    H = height_map_avg[::stride,::stride]
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     ax.plot_surface(X,Y, H.T)
