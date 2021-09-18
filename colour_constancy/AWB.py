@@ -9,7 +9,7 @@ def grey_world(img):
 
 
 if __name__ == '__main__':
-    original_img = cv2.imread('./colour_constancy/What-Are-Plants.jpg')
+    original_img = cv2.imread('./colour_constancy/awb.jpg')
     original_img = cv2.cvtColor(original_img, cv2.COLOR_BGR2RGB)
 
     img_after_gw = grey_world(original_img)
