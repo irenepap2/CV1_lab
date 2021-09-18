@@ -31,10 +31,12 @@ def ConvertColourSpace(input_image, colourspace):
 
     elif colourspace.lower() == 'hsv':
         # use built-in function from opencv
+        new_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2HSV)
         pass
 
     elif colourspace.lower() == 'ycbcr':
         # use built-in function from opencv
+        new_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2YCrCb)
         pass
 
     elif colourspace.lower() == 'gray':
@@ -52,11 +54,21 @@ def ConvertColourSpace(input_image, colourspace):
 
 if __name__ == '__main__':
     # Replace the image name with a valid image
-    img_path = 'test.png'
+    img_path = './colourspace/Sphere_0.0_0.0.png'
     # Read with opencv
     I = cv2.imread(img_path)
+    
     # Convert from BGR to RGB
     # This is a shorthand.
     I = I[:, :, ::-1]
 
-    out_img = ConvertColourSpace(I, 'opponent.png')
+    # visualize(I)
+    out_img = ConvertColourSpace(I, 'opponent')
+    out_img = ConvertColourSpace(I, 'rgb')
+    out_img = ConvertColourSpace(I, 'hsv')
+    out_img = ConvertColourSpace(I, 'ycbcr')
+    out_img = ConvertColourSpace(I, 'gray')
+    
+
+    print('Converted')
+    plt.show()
