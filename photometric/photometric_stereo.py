@@ -74,28 +74,28 @@ def photometric_stereo(image_dir='./SphereGray5/', isRGB = False):
         # show results
         show_results_RGB(albedos, normals_all_channels, height_map_all_channels, SE_all_channels)
 
-    ## Face
-    def photometric_stereo_face(image_dir='./yaleB02/'):
-        [image_stack, scriptV] = load_face_images(image_dir)
-        [h, w, n] = image_stack.shape
-        print('Finish loading %d images.\n' % n)
-        print('Computing surface albedo and normal map...\n')
-        albedo, normals = estimate_alb_nrm(image_stack, scriptV)
+## Face
+def photometric_stereo_face(image_dir='./yaleB02/'):
+    [image_stack, scriptV] = load_face_images(image_dir)
+    [h, w, n] = image_stack.shape
+    print('Finish loading %d images.\n' % n)
+    print('Computing surface albedo and normal map...\n')
+    albedo, normals = estimate_alb_nrm(image_stack, scriptV, False)
 
-        # integrability check: is (dp / dy  -  dq / dx) ^ 2 small everywhere?
-        print('Integrability checking')
-        p, q, SE = check_integrability(normals)
+    # integrability check: is (dp / dy  -  dq / dx) ^ 2 small everywhere?
+    print('Integrability checking')
+    p, q, SE = check_integrability(normals)
 
-        threshold = 0.005
-        print('Number of outliers: %d\n' % np.sum(SE > threshold))
-        SE[SE <= threshold] = float('nan') # for good visualization
+    threshold = 0.005
+    print('Number of outliers: %d\n' % np.sum(SE > threshold))
+    SE[SE <= threshold] = float('nan') # for good visualization
 
-        # compute the surface height
-        height_map = construct_surface( p, q )
+    # compute the surface height
+    height_map = construct_surface( p, q , 'column')
 
-        # show results
-        show_results(albedo, normals, height_map, SE)
+    # show results
+    show_results(albedo, normals, height_map, SE)
     
 if __name__ == '__main__':
-    photometric_stereo('./photometric/photometrics_images/MonkeyColor/', isRGB=True)
-    # photometric_stereo_face()
+    # photometric_stereo('./photometric/photometrics_images/SphereGray25/', isRGB=False)
+    photometric_stereo_face('./photometric/photometrics_images/yaleB02/')

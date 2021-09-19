@@ -1,6 +1,6 @@
 import numpy as np
 
-def construct_surface(p, q, path_type='average'):
+def construct_surface(p, q, path_type='row'):
 
     '''
     CONSTRUCT_SURFACE construct the surface function represented as height_map
@@ -18,8 +18,8 @@ def construct_surface(p, q, path_type='average'):
         for i in range(1,h):
             height_map[i,0] = height_map[i-1,0] + q[i,0]
 
-        for i in range(w):
-            for j in range(1,h):
+        for i in range(h):
+            for j in range(1,w):
                 height_map[i,j] = height_map[i,j-1] + p[i,j]
         """
         ================
@@ -39,8 +39,8 @@ def construct_surface(p, q, path_type='average'):
         for i in range(1,w):
             height_map[0,i] = height_map[0,i-1] + p[0,i]
 
-        for i in range(h):
-            for j in range(1,w):
+        for i in range(w):
+            for j in range(1,h):
                 height_map[j,i] = height_map[j-1,i] + q[j,i]
         
         """
@@ -56,15 +56,15 @@ def construct_surface(p, q, path_type='average'):
         for i in range(1,h):
             height_map_column[i,0] = height_map_column[i-1,0] + q[i,0]
 
-        for i in range(w):
-            for j in range(1,h):
+        for i in range(h):
+            for j in range(1,w):
                 height_map_column[i,j] = height_map_column[i,j-1] + p[i,j]
 
         for i in range(1,w):
             height_map_row[0,i] = height_map_row[0,i-1] + p[0,i]
 
-        for i in range(h):
-            for j in range(1,w):
+        for i in range(w):
+            for j in range(1,h):
                 height_map_row[j,i] = height_map_row[j-1,i] + q[j,i]
         
         height_map = (height_map_column + height_map_row)/2

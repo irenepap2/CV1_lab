@@ -81,7 +81,7 @@ def load_face_images(image_dir='./yaleB02/'):
     
 def show_results(albedo, normals, height_map, SE):
     # Stride in the plot, you may want to adjust it to different images
-    stride = 8
+    stride = 1
     
     # showing albedo map
     fig = plt.figure()
@@ -108,16 +108,16 @@ def show_results(albedo, normals, height_map, SE):
     np.arange(1))
     X = X[..., 0]
     Y = Y[..., 0]
-    Z = height_map[::stride,::stride]
+    Z = height_map[::stride,::stride].T
     '''
     =============
     You could further inspect the shape of the objects and normal directions by using plt.quiver() function.  
     =============
     '''
     fig = plt.figure().add_subplot(projection='3d')
-    U = normals[::stride,::stride, 0]
-    V = normals[::stride,::stride, 1]
-    W = normals[::stride,::stride, 2]
+    U = normals[::stride,::stride, 0].T
+    V = normals[::stride,::stride, 1].T
+    W = normals[::stride,::stride, 2].T
     plt.quiver(X, Y, Z, U, V, W, length=0.1, normalize=True)
     plt.show()
 

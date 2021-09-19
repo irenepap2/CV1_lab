@@ -40,15 +40,15 @@ def estimate_alb_nrm( image_stack, scriptV, shadow_trick=True):
         normal at this point is g / |g|
     """
 
-    for x in range(w):
-        for y in range(h):
+    for x in range(h):
+        for y in range(w):
             i = image_stack[x,y,:]
             
             if shadow_trick:
                 scriptI = np.diag(i)
             else:
                 scriptI = np.eye(n)
-
+            scriptV = np.nan_to_num(scriptV)
             g, _, _, _ = np.linalg.lstsq(np.matmul(scriptI,scriptV),np.matmul(scriptI,i),rcond=None)
             
             albedo[x,y] = np.linalg.norm(g)
