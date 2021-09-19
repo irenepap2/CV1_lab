@@ -20,7 +20,7 @@ def ConvertColourSpace(input_image, colourspace):
 
     # Convert the image into double precision for conversions
     input_image = input_image.astype(np.float32)
-
+    
     if colourspace.lower() == 'opponent':
         # fill in the rgb2opponent function
         new_image = rgbConversions.rgb2opponent(input_image)
@@ -32,11 +32,24 @@ def ConvertColourSpace(input_image, colourspace):
     elif colourspace.lower() == 'hsv':
         # use built-in function from opencv
         new_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2HSV)
+        new_image[:, :, 0] = new_image[:, :, 0] * (255/360)
+        new_image[:, :, 1] = new_image[:, :, 1] * 255
+        
         pass
 
     elif colourspace.lower() == 'ycbcr':
         # use built-in function from opencv
         new_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2YCrCb)
+        
+        # Swap Cr and Cb
+        # new_image_y = new_image[:, :, 0]
+        new_image_Cr = np.array(new_image[:, :, 1])
+        new_image_Cb = np.array(new_image[:, :, 2])
+
+        new_image[:, :, 1] = new_image_Cb
+        new_image[:, :, 2] = new_image_Cr
+
+        cv2.normalize(new_image,  new_image, 0, 255, cv2.NORM_MINMAX)
         pass
 
     elif colourspace.lower() == 'gray':
@@ -47,6 +60,7 @@ def ConvertColourSpace(input_image, colourspace):
         print('Error: Unknown colorspace type [%s]...' % colourspace)
         new_image = input_image
 
+
     visualize(new_image)
 
     return new_image
@@ -54,7 +68,7 @@ def ConvertColourSpace(input_image, colourspace):
 
 if __name__ == '__main__':
     # Replace the image name with a valid image
-    img_path = './colourspace/Sphere_0.0_0.0.png'
+    img_path = './colourspace/kouzes.png'
     # Read with opencv
     I = cv2.imread(img_path)
     
@@ -62,13 +76,12 @@ if __name__ == '__main__':
     # This is a shorthand.
     I = I[:, :, ::-1]
 
-    # visualize(I)
+
     out_img = ConvertColourSpace(I, 'opponent')
     out_img = ConvertColourSpace(I, 'rgb')
     out_img = ConvertColourSpace(I, 'hsv')
     out_img = ConvertColourSpace(I, 'ycbcr')
     out_img = ConvertColourSpace(I, 'gray')
     
-
     print('Converted')
     plt.show()
