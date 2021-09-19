@@ -19,7 +19,7 @@ def photometric_stereo(image_dir='./SphereGray5/', isRGB = False):
 
         # compute the surface gradient from the stack of imgs and light source mat
         print('Computing surface albedo and normal map...\n')
-        [albedo, normals] = estimate_alb_nrm(image_stack, scriptV, True)
+        [albedo, normals] = estimate_alb_nrm(image_stack, scriptV, False)
 
         # integrability check: is (dp / dy  -  dq / dx) ^ 2 small everywhere?
         print('Integrability checking\n')
@@ -64,7 +64,7 @@ def photometric_stereo(image_dir='./SphereGray5/', isRGB = False):
             SE[SE <= threshold] = float('nan') # for good visualization
 
             # compute the surface height
-            height_map = construct_surface( p, q )
+            height_map = construct_surface( p, q , 'average')
 
             albedos[:, :, i] = albedo
             normals_all_channels[:, :, :, i] = normals
@@ -97,5 +97,5 @@ def photometric_stereo_face(image_dir='./yaleB02/'):
     show_results(albedo, normals, height_map, SE)
     
 if __name__ == '__main__':
-    # photometric_stereo('./photometric/photometrics_images/SphereGray25/', isRGB=False)
+    # photometric_stereo('./photometric/photometrics_images/MonkeyColor/', isRGB=True)
     photometric_stereo_face('./photometric/photometrics_images/yaleB02/')

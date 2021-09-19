@@ -45,7 +45,7 @@ def load_syn_images(image_dir='./lab1/photometric/photometrics_images/SphereGray
     
     
 def load_face_images(image_dir='./yaleB02/'):
-    num_images = 64
+    num_images = 39
     filename = os.path.join(image_dir, 'yaleB02_P00_Ambient.pgm')
     ambient_image = cv2.imread(filename, -1)
     h, w = ambient_image.shape
@@ -148,7 +148,7 @@ def show_results_RGB(albedo, normals, height_map, SE):
     
     # showing normals as three separate channels
     print(normals.shape)
-    normals_avg = np.nanmean(normals, axis = 2)
+    normals_avg = np.nanmean(normals, axis = 3)
     figure = plt.figure()
     ax1 = figure.add_subplot(131)
     ax1.imshow(normals_avg[..., 0])
@@ -158,6 +158,9 @@ def show_results_RGB(albedo, normals, height_map, SE):
     ax3.imshow(normals_avg[..., 2])
     plt.show()
     
+    figure = plt.figure()
+    plt.imshow(normals_avg)
+    plt.show()
     # meshgrid
     X, Y, _ = np.meshgrid(np.arange(0,np.shape(normals_avg)[0], stride),
     np.arange(0,np.shape(normals_avg)[1], stride),
