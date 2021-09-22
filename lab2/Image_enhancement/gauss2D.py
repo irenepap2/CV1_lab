@@ -10,5 +10,5 @@ def gauss2D(sigma_x, sigma_y , kernel_size):
     return G
 
 if __name__ == '__main__':
-    G = gauss2D(1, 1, 5)
+    G = gauss2D(2, 2, 5)
     print(G)

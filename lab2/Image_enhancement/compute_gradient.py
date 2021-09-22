@@ -6,8 +6,8 @@ from scipy import signal
 def compute_gradient(image):
     sobel_x = np.array([[1, 0, -1], [2, 0, -2], [1, 0 , -1]])
     sobel_y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-    Gx = signal.convolve2d(image, sobel_x, boundary='symm', mode='same')
-    Gy = signal.convolve2d(image, sobel_y, boundary='symm', mode='same')
+    Gx = signal.convolve2d(image, sobel_x, mode='same')
+    Gy = signal.convolve2d(image, sobel_y, mode='same')
     im_magnitude = np.sqrt(np.add(Gx**2, Gy**2))
     im_direction = np.arctan(np.divide(Gy,Gx))
     return Gx, Gy, im_magnitude,im_direction
