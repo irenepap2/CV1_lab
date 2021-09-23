@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def createGabor( sigma, theta, lamda, psi, gamma ):
-#CREATEGABOR Creates a complex valued Gabor filter. 1
+#CREATEGABOR Creates a complex valued Gabor filter.
 #   myGabor = createGabor( sigma, theta, lamda, psi, gamma ) generates
 #   Gabor kernels.  
 #   - ARGUMENTS
