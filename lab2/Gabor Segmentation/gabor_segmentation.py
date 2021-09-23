@@ -4,8 +4,9 @@ import math
 import numpy as np
 import time
 from sklearn.decomposition import PCA
-from creatGabor import createGabor
-
+from createGabor import createGabor
+from scipy import signal
+from sklearn.cluster import KMeans
 
 
 # Hyperparameters
@@ -19,7 +20,7 @@ image_id = 'Polar' # Identifier to switch between input images.
 err_msg  = 'Image not available.'
 
 # Control settings
-visFlag       = False    #  Set to true to visualize filter responses.
+visFlag       = True    #  Set to true to visualize filter responses.
 smoothingFlag = True   #  Set to true to postprocess filter outputs.
 
 # Read image : Please check that your path is correct
@@ -145,8 +146,8 @@ featureMaps = []
 for gaborFilter in gaborFilterBank:
     # gaborFilter["filterPairs"] has two elements. One is related to the real part 
     # of the Gabor Filter and the other one is the imagineray part.
-    real_out = None  # \\TODO: filter the grayscale input with real part of the Gabor
-    imag_out = None  # \\TODO: filter the grayscale input with imaginary part of the Gabor
+    real_out = signal.convolve2d(img, gaborFilter["filterPairs"][:, :, 0], boundary='fill', mode='same')
+    imag_out = signal.convolve2d(img, gaborFilter["filterPairs"][:, :, 1], boundary='fill', mode='same')
     featureMaps.append(np.stack((real_out, imag_out), 2))
     
     # Visualize the filter responses if you wish.
@@ -173,7 +174,7 @@ featureMags = []
 for i, fm in enumerate(featureMaps):
     real_part = fm[...,0]
     imag_part = fm[...,1]
-    mag = None  # \\TODO: Compute the magnitude here
+    mag = np.sqrt(pow(real_part,2), pow(imag_part,2))
     featureMags.append(mag)
     
     # Visualize the magnitude response if you wish.
@@ -201,12 +202,9 @@ for i, fm in enumerate(featureMaps):
 # \\ Hint: cv2 filter2D function is helpful here.   
 features = np.zeros(shape=(numRows, numCols, len(featureMags)))
 if smoothingFlag:
-    pass
-    # \\TODO:
-    #FOR_LOOP
-        # i)  filter the magnitude response with appropriate Gaussian kernels
-        # ii) insert the smoothed image into features[:,:,j]
-    #END_FOR
+    for i, fmag in enumerate(featureMags):
+        kernel = cv2.getGaussianKernel(3, 1)
+        features[:,:,i] = signal.convolve2d(fmag, kernel, boundary='fill', mode='same')
 else:
     # Don't smooth but just insert magnitude images into the matrix
     # called features.
@@ -224,8 +222,7 @@ features = np.reshape(features, newshape=(numRows * numCols, -1))
 # Standardize features. 
 # \\ Hint: see http://ufldl.stanford.edu/wiki/index.php/Data_Preprocessing for more information.
 
-features = None  # \\ TODO: i)  Implement standardization on matrix called features.
-                 #          ii) Return the standardized data matrix.
+features = (features - np.mean(features)) / np.std(features)
 
 
 # (Optional) Visualize the saliency map using the first principal component 
@@ -247,7 +244,7 @@ plt.show()
 # \\ Hint-2: use the parameter k defined in the first section when calling
 #            sklearn's built-in kmeans function.
 tic = time.time()
-pixLabels = None  # \\TODO: Return cluster labels per pixel
+pixLabels = KMeans(n_clusters=k).fit_predict(features)
 ctime = time.time() - tic
 print(f'Clustering completed in {ctime} seconds.')
 
@@ -267,7 +264,7 @@ plt.show()
 Aseg1 = np.zeros_like(img)
 Aseg2 = np.zeros_like(img)
 BW = pixLabels == 2  # check for the value of your labels in pixLabels (could be 1 or 0 instead of 2)
-BW = np.repeat(BW[:, :, np.newaxis], 3, axis=2) # do this only if you have 3 channels in the img
+#BW = np.repeat(BW[:, :, np.newaxis], 3, axis=2) # do this only if you have 3 channels in the img
 Aseg1[BW] = img[BW]
 Aseg2[~BW] = img[~BW]
 
