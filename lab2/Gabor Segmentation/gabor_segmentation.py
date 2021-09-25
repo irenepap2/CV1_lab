@@ -7,12 +7,14 @@ from sklearn.decomposition import PCA
 from createGabor import createGabor
 from scipy import signal
 from sklearn.cluster import KMeans
+from gauss2D import gauss2D
+from numpy import pi, exp, sqrt
 
 
 # Hyperparameters
 k        = 2      # number of clusters in k-means algorithm. By default, 
                   # we consider k to be 2 in foreground-background segmentation task.
-image_id = 'Polar' # Identifier to switch between input images.
+image_id = 'Kobi' # Identifier to switch between input images.
                   # Possible ids: 'Kobi',    'Polar', 'Robin-1'
                   #               'Robin-2', 'Cows', 'SciencePark'
 
@@ -20,32 +22,32 @@ image_id = 'Polar' # Identifier to switch between input images.
 err_msg  = 'Image not available.'
 
 # Control settings
-visFlag       = True    #  Set to true to visualize filter responses.
+visFlag       = False    #  Set to true to visualize filter responses.
 smoothingFlag = True   #  Set to true to postprocess filter outputs.
 
 # Read image : Please check that your path is correct
 if image_id == 'Kobi':
-  img = cv2.imread('./data/kobi.png')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//kobi.png')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  resize_factor = 0.25
+  resize_factor = 0.3
 elif image_id == 'Polar':
-  img = cv2.imread('./data/polar-bear-hiding.jpg')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//polar-bear-hiding.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.75
 elif image_id == 'Robin-1':
-  img = cv2.imread('./data/robin-1.jpg')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//robin-1.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 1
 elif image_id == 'Robin-2':
-  img = cv2.imread('./data/robin-2.jpg')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//robin-2.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.5
 elif image_id == 'Cows':
-  img = cv2.imread('./data/cows.jpg')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//cows.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.5
 elif image_id == 'SciencePark':
-  img = cv2.imread('./data/sciencepark.jpg')
+  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//sciencepark.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.2         
 else:
@@ -89,7 +91,7 @@ orientations = np.arange(0, np.pi+dTheta, dTheta)
 
 # Define the set of sigmas for the Gaussian envelope. Sigma here defines 
 # the standard deviation, or the spread of the Gaussian. 
-sigmas = np.array([1,2])
+sigmas = np.array([11])
 
 # Now you can create the filterbank. We provide you with a Python list
 # called gaborFilterBank in which we will hold the filters and their
@@ -202,8 +204,11 @@ for i, fm in enumerate(featureMaps):
 # \\ Hint: cv2 filter2D function is helpful here.   
 features = np.zeros(shape=(numRows, numCols, len(featureMags)))
 if smoothingFlag:
+    kernel = gauss2D(5, 5, 3)
+    #s, k = 3, 2 #  generate a (2k+1)x(2k+1) gaussian kernel with mean=0 and sigma = s
+    #probs = [exp(-z*z/(2*s*s))/sqrt(2*pi*s*s) for z in range(-k,k+1)] 
+    #kernel = np.outer(probs, probs)
     for i, fmag in enumerate(featureMags):
-        kernel = cv2.getGaussianKernel(3, 1)
         features[:,:,i] = signal.convolve2d(fmag, kernel, boundary='fill', mode='same')
 else:
     # Don't smooth but just insert magnitude images into the matrix
@@ -263,7 +268,7 @@ plt.show()
 # Use the pixLabels to visualize segmentation.
 Aseg1 = np.zeros_like(img)
 Aseg2 = np.zeros_like(img)
-BW = pixLabels == 2  # check for the value of your labels in pixLabels (could be 1 or 0 instead of 2)
+BW = pixLabels == 1  # check for the value of your labels in pixLabels (could be 1 or 0 instead of 2)
 #BW = np.repeat(BW[:, :, np.newaxis], 3, axis=2) # do this only if you have 3 channels in the img
 Aseg1[BW] = img[BW]
 Aseg2[~BW] = img[~BW]

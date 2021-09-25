@@ -8,7 +8,7 @@ def Visualize_parameters():
     base_theta = np.pi/4
     base_sigma = 4
     base_gamma = 0.5
-    base_lamda = 1
+    base_lamda = 3
     base_psi = 0
 
     base_gabor = createGabor(base_sigma, base_theta, base_lamda, base_psi, base_gamma )
