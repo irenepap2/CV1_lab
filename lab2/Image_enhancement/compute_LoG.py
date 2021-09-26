@@ -24,9 +24,9 @@ def compute_LoG(image, LOG_type):
     if LOG_type == 1:
         #method 1
         G = gauss2D(0.5, 0.5, 5)
-        G = signal.convolve2d(image, G, boundary='fill', mode='same')
+        G = signal.convolve2d(image, G, mode='same')
         laplacian = np.array([[0, 1, 0], [1, -4, 1], [0, 1 , 0]])
-        imOut = signal.convolve2d(image, laplacian, boundary='fill', mode='same')
+        imOut = signal.convolve2d(image, laplacian, mode='same')
         return imOut
 
     elif LOG_type == 2:
@@ -34,7 +34,7 @@ def compute_LoG(image, LOG_type):
         #LoG = log2D(0.5, 5)
         #LoG = nd.gaussian_laplace(image, 0.5)
         LoG = np.array([[0, 0, 1, 0, 0], [0, 1, 2, 1, 0], [1, 2, -16, 2 , 1], [0, 1, 2, 1, 0], [0, 0, 1, 0, 0]])
-        imOut = signal.convolve2d(image, LoG, boundary='fill', mode='same')
+        imOut = signal.convolve2d(image, LoG, mode='same')
         return imOut
 
     elif LOG_type == 3:
@@ -43,7 +43,7 @@ def compute_LoG(image, LOG_type):
         #1.6 times σ1
         G2 = gauss2D(0.8, 0.8, 5)
         DoG = G1 - G2
-        imOut = signal.convolve2d(image, DoG, boundary='fill', mode='same')
+        imOut = signal.convolve2d(image, DoG, mode='same')
         return imOut
 
 if __name__ == '__main__':
