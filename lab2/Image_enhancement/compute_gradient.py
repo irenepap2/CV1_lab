@@ -13,7 +13,7 @@ def compute_gradient(image):
     return Gx, Gy, im_magnitude,im_direction
 
 if __name__ == '__main__':
-    im = cv2.imread('./lab2/Image_enhancement/images/image2.jpg', 0)
+    im = cv2.imread('./Image_enhancement/images/image2.jpg', 0)
     Gx, Gy, im_magnitude, im_direction = compute_gradient(im) 
 
     fig, ([gx, gy], [mag, direc]) = plt.subplots(2, 2, figsize=(6, 15))   

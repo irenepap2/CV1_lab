@@ -32,7 +32,7 @@ def compute_LoG(image, LOG_type):
     elif LOG_type == 2:
         #method 2
         #LoG = log2D(0.5, 5)
-        #LoG = nd.gaussian_laplace(image, 0.5)
+        # we found a 5x5 LoG kernel on the internet, which gives better results
         LoG = np.array([[0, 0, 1, 0, 0], [0, 1, 2, 1, 0], [1, 2, -16, 2 , 1], [0, 1, 2, 1, 0], [0, 0, 1, 0, 0]])
         imOut = signal.convolve2d(image, LoG, mode='same')
         return imOut
@@ -47,9 +47,9 @@ def compute_LoG(image, LOG_type):
         return imOut
 
 if __name__ == '__main__':
-    im = cv2.imread('./lab2/Image_enhancement/images/image2.jpg', 0)
+    im = cv2.imread('./Image_enhancement/images/image2.jpg', 0)
 
-    imOut = compute_LoG(im, LOG_type=3)
+    imOut = compute_LoG(im, LOG_type=1)
 
     figure = plt.figure()
     plt.imshow(imOut, cmap="gray")

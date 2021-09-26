@@ -27,27 +27,27 @@ smoothingFlag = True   #  Set to true to postprocess filter outputs.
 
 # Read image : Please check that your path is correct
 if image_id == 'Kobi':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//kobi.png')
+  img = cv2.imread('./Gabor Segmentation/data/kobi.png')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.3
 elif image_id == 'Polar':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//polar-bear-hiding.jpg')
+  img = cv2.imread('./Gabor Segmentation/data/polar-bear-hiding.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.75
 elif image_id == 'Robin-1':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//robin-1.jpg')
+  img = cv2.imread('./Gabor Segmentation/data/robin-1.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 1
 elif image_id == 'Robin-2':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//robin-2.jpg')
+  img = cv2.imread('./Gabor Segmentation/data/robin-2.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.5
 elif image_id == 'Cows':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//cows.jpg')
+  img = cv2.imread('./Gabor Segmentation/data/cows.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.5
 elif image_id == 'SciencePark':
-  img = cv2.imread('C://Users//silav//Downloads//CV1_lab-main//CV1_lab-main//lab2//Gabor Segmentation//data//sciencepark.jpg')
+  img = cv2.imread('./Gabor Segmentation/data/sciencepark.jpg')
   img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   resize_factor = 0.2         
 else:
