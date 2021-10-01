@@ -4,22 +4,17 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.ndimage.filters import maximum_filter
 from gauss2D import *
-import scipy.stats as st
 
-def get_harris_points(H):
+def get_corner_points(H, threshold):
+    # using scipy.ndimage.filters.maximum_filter to compute the local maxima of H
     H_local_maxima = maximum_filter(H, size=5)
-    H[H < H_local_maxima] = 0.0
-    r, c = np.where(H > 0.001)
+    # we set the values that are less than out threshold to -1
+    H[H < threshold] = -1
+    # we take the rows and columns where our H - H_local_maxima == 0, so when our centered point is the maximum
+    r, c = np.where(H - H_local_maxima == 0) 
     return r, c
 
-def max_of_neighbors(H, radius, rowNumber, columnNumber):
-    neighbors = [[H[i][j] if  i >= 0 and i < len(H) and j >= 0 and j < len(H[0]) else 0
-    for j in range(columnNumber-1-radius, columnNumber+radius)]
-      for i in range(rowNumber-1-radius, rowNumber+radius)]
-    return np.max(np.array(neighbors))
-
-def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, window):
-    
+def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, window):   
     # convert from uint8 to float32
     img = img.astype(np.float32) / 255
     
@@ -38,31 +33,21 @@ def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, windo
 
     #computing H
     H = (A * C - B**2) - 0.04 * (A + C)**2
-
-    #computing local maxima of H
-    # r: row indices of corners
-    # c: column indices of corners
-    r = []
-    c = []
-    for i in range(H.shape[0]):
-        for j in range(H.shape[1]):
-            if (H[i][j] == max_of_neighbors(H, window, i, j) and H[i][j] > threshold):
-                r.append(i)
-                c.append(j)
     
-    #r,c  = get_harris_points(H)
+    #compute corner points
+    r,c  = get_corner_points(H, threshold)
     plot_figures(img, Ix, Iy, H, r, c)
     return H, r, c
 
 def plot_figures(img, Ix, Iy, H, r, c):   
     fig, (ix, iy, corners) = plt.subplots(1, 3, figsize=(12, 5))
-    ix.imshow(Ix, cmap="gray")
+    ix.imshow(Ix)
     ix.set_title('Gradient in x-direction')
     ix.set_axis_off()
-    iy.imshow(Iy, cmap="gray")
+    iy.imshow(Iy)
     iy.set_title('Gradient in y-direction')
     iy.set_axis_off()
-    corners.imshow(img, cmap="gray")
+    corners.imshow(img)
     corners.scatter(c, r, s=1, color='red')
     corners.set_title('Corners')
     corners.set_axis_off()
