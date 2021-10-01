@@ -121,14 +121,16 @@ def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg
     
 def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15, r=np.array([5]), c=np.array([5])):
     
-    c = c[r >= (region_size//2)]
-    r = r[r >= (region_size//2)]
-
-    r = r[c >= (region_size//2)]
-    c = c[c >= (region_size//2)]
-
     I_t0, I_t1 = load_images(name_image1, name_image2)
-    
+
+    h, w = I_t0.shape
+
+    c = c[r >= (region_size//2) and r <= h-(region_size//2)]
+    r = r[r >= (region_size//2) and r <= h-(region_size//2)]
+    r = r[c >= (region_size//2) and c <= w-(region_size//2)]
+    c = c[c >= (region_size//2) and c <= w-(region_size//2)]
+
+
     I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
 
     sub_I_x, sub_I_y, sub_I_t = calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size)
