@@ -4,13 +4,6 @@ import os
 import numpy as np
 from scipy import signal 
 
-# 1. Divide input images on non-overlapping regions, each region being 15x15.
-# 2. For each region compute A, AT and b. Then, estimate optical flow as given in Equation 22.
-# 3. When you have estimation for optical flow (Vx; Vy) of each region, you
-# should display the results. There is a matplotlib function quiver which
-# plots a set of two-dimensional vectors as arrows on the screen. Try to
-# figure out how to use this to show your optical flow results.
-
 def calculate_derivatives(I_t0, I_t1):
     # Obtain image x,y-derivatives.
     first_derivative = np.array([[-1, 0, 1]])
@@ -37,6 +30,73 @@ def load_images(name_image_t0, name_image_t1):
 
     return  I_t0, I_t1
 
+def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
+
+    h, w = I_x.shape
+    horizontal_subregions = h // region_size
+    vertical_subregions = w // region_size
+    
+    # subregions = np.zeros(horizontal_subregions, vertical_subregions, horizontal_subregions * vertical_subregions)
+    sub_I_x = []
+    sub_I_y = []
+    sub_I_t = []
+    
+    for i in range(horizontal_subregions):
+        h_begin = i*region_size
+        h_end   = (i+1)*region_size
+        for j in range(vertical_subregions):
+            v_begin = j*region_size
+            v_end   = (j+1)*region_size
+            sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
+            sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
+            sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
+
+    return sub_I_x, sub_I_y, sub_I_t
+
+def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
+
+    h, w = I_t0.shape
+    horizontal_subregions = h // region_size
+    vertical_subregions = w // region_size
+    
+    # subregions = np.zeros(horizontal_subregions, vertical_subregions, horizontal_subregions * vertical_subregions)
+    sub_I_x = []
+    sub_I_y = []
+    sub_I_t = []
+    
+    for i in range(horizontal_subregions):
+        h_begin = i*region_size
+        h_end   = (i+1)*region_size
+        for j in range(vertical_subregions):
+            v_begin = j*region_size
+            v_end   = (j+1)*region_size
+            sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
+            sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
+            sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
+
+    return sub_I_x, sub_I_y, sub_I_t
+
+def calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size):
+
+
+    number_of_points = r.shape[0]
+
+
+    sub_I_x = []
+    sub_I_y = []
+    sub_I_t = []
+    for i in range(number_of_points):
+        h_begin = r[i] - (region_size//2)
+        h_end   = r[i] + (region_size//2)
+        v_begin = c[i] - (region_size//2)
+        v_end   = c[i] + (region_size//2)
+        sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
+        sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
+        sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
+    
+
+    return sub_I_x, sub_I_y, sub_I_t
+
 def calculate_flow_vectors(I_x, I_y, I_t):
 
     V_x = []
@@ -61,29 +121,14 @@ def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg
     
     I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
 
-    h, w = I_t0.shape
-
-    horizontal_subregions = h // region_size
-    vertical_subregions = w // region_size
-    number_of_subregions = horizontal_subregions * vertical_subregions
-    # subregions = np.zeros(horizontal_subregions, vertical_subregions, horizontal_subregions * vertical_subregions)
-    sub_I_x = []
-    sub_I_y = []
-    sub_I_t = []
-    
-    for i in range(horizontal_subregions):
-        h_begin = i*region_size
-        h_end   = (i+1)*region_size
-        for j in range(vertical_subregions):
-            v_begin = j*region_size
-            v_end   = (j+1)*region_size
-            sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
-            sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
-            sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
-  
+    sub_I_x, sub_I_y, sub_I_t = calculate_subregions(I_t0, I_x, I_y, I_t, region_size)
 
     V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
     
+    h, w = I_x.shape
+    horizontal_subregions = h // region_size
+    vertical_subregions = w // region_size
+
     subregion_indices = []
     for i in range(horizontal_subregions):
         for j in range(vertical_subregions):
@@ -95,9 +140,26 @@ def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg
     
     return subregion_indices, V_x, V_y
     
+def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15, r, c):
+    
+    I_t0, I_t1 = load_images(name_image1, name_image2)
+    
+    I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
+
+    sub_I_x, sub_I_y, sub_I_t = calculate_subregions(I_t0, I_x, I_y, I_t, region_size)
+
+    V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
+        
+    subregion_indices = np.array((r.T,c.T))    
+    
+    return subregion_indices, V_x, V_y
+
+
+
+
 if __name__ == '__main__':
 
-    original_image = cv2.imread('./images/Car1.jpg')
+    original_image = cv2.imread('./images/Car2.jpg')
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     subregion_indices, V_x, V_y = calculate_optical_flow_with_LK()
     plt.figure()
