@@ -16,14 +16,11 @@ def calculate_derivatives(I_t0, I_t1):
 
     return I_x, I_y, I_t
 
-def load_images(name_image_t0, name_image_t1):
-    image_dir = './images/'
-
+def load_images(name_image_t0, name_image_t1, image_dir='./images/'):
     # Load the two images
     I_t0 = cv2.imread(image_dir + name_image_t0,0)
     I_t1 = cv2.imread(image_dir + name_image_t1,0)
    
-
     # Convert the to np.float32
     I_t0 = I_t0.astype(np.float32)
     I_t1 = I_t1.astype(np.float32)
@@ -56,9 +53,7 @@ def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
 
 def calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size):
 
-
     number_of_points = r.shape[0]
-
 
     sub_I_x = []
     sub_I_y = []
@@ -70,8 +65,7 @@ def calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size):
         v_end   = c[i] + (region_size//2)
         sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
         sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
-        sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
-    
+        sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end]) 
 
     return sub_I_x, sub_I_y, sub_I_t
 
@@ -119,17 +113,16 @@ def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg
     V_y = np.array(V_y)
     return subregion_indices, V_x, V_y
     
-def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15, r=np.array([5]), c=np.array([5])):
+def calculate_optical_flow_with_LK_for_corners(name_image1, name_image2, image_path, r, c, region_size=15):
     
-    I_t0, I_t1 = load_images(name_image1, name_image2)
+    I_t0, I_t1 = load_images(name_image1, name_image2, image_path)
 
     h, w = I_t0.shape
-
-    c = c[r >= (region_size//2) and r <= h-(region_size//2)]
-    r = r[r >= (region_size//2) and r <= h-(region_size//2)]
-    r = r[c >= (region_size//2) and c <= w-(region_size//2)]
-    c = c[c >= (region_size//2) and c <= w-(region_size//2)]
-
+    
+    c = c[(r >= (region_size//2))]
+    r = r[(r >= (region_size//2))]
+    r = r[(c >= (region_size//2))]
+    c = c[(c >= (region_size//2))]
 
     I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
 
@@ -137,12 +130,12 @@ def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_imag
 
     V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
         
-    subregion_indices = np.array((c, r)).T    
+    subregion_indices = np.array((c, r)).T
+
+    V_x = np.array(V_x)
+    V_y = np.array(V_y)    
     
     return subregion_indices, V_x, V_y
-
-
-
 
 if __name__ == '__main__':
 

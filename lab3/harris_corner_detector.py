@@ -37,6 +37,7 @@ def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, windo
     
     #compute corner points
     r,c  = get_corner_points(H, threshold)
+
     plot_figures(img, Ix, Iy, H, r, c)
     return H, r, c
 
@@ -59,10 +60,3 @@ if __name__ == '__main__':
     im = cv2.imread('./images/toy/0001.jpg', 0)
     # detect corners and show results
     H, r, c = harris_corner_detector(im, 1, 3, 0.001, 5)
-
-    subregion_indices, V_x, V_y = calculate_optical_flow_with_LK_for_corners(name_image1='toy/0001.jpg',name_image2='toy/0002.jpg',r=r,c=c,region_size=15)
-
-    plt.figure()
-    plt.imshow(im)
-    plt.quiver(subregion_indices[:,0], subregion_indices[:,1], V_x, V_y, angles='xy', scale_units='xy', scale=0.1)
-    plt.show()
