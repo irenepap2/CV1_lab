@@ -137,20 +137,27 @@ def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg
             subregion_indices.append((x, y))
 
     subregion_indices = np.array(subregion_indices)    
-    
+    V_x = np.array(V_x)
+    V_y = np.array(V_y)
     return subregion_indices, V_x, V_y
     
-def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15, r, c):
+def calculate_optical_flow_with_LK_for_corners(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15, r=np.array([5]), c=np.array([5])):
     
+    c = c[r >= (region_size//2)]
+    r = r[r >= (region_size//2)]
+
+    r = r[c >= (region_size//2)]
+    c = c[c >= (region_size//2)]
+
     I_t0, I_t1 = load_images(name_image1, name_image2)
     
     I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
 
-    sub_I_x, sub_I_y, sub_I_t = calculate_subregions(I_t0, I_x, I_y, I_t, region_size)
+    sub_I_x, sub_I_y, sub_I_t = calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size)
 
     V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
         
-    subregion_indices = np.array((r.T,c.T))    
+    subregion_indices = np.array((c, r)).T    
     
     return subregion_indices, V_x, V_y
 
