@@ -29,16 +29,15 @@ def load_images(name_image_t0, name_image_t1):
     # Load the two images
     I_t0 = cv2.imread(image_dir + name_image_t0,0)
     I_t1 = cv2.imread(image_dir + name_image_t1,0)
-    original_image = cv2.imread(image_dir + name_image_t1)
-    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+   
 
     # Convert the to np.float32
     I_t0 = I_t0.astype(np.float32)
     I_t1 = I_t1.astype(np.float32)
 
-    return original_image, I_t0, I_t1
+    return  I_t0, I_t1
 
-def calculate_optical_flow(I_x, I_y, I_t):
+def calculate_flow_vectors(I_x, I_y, I_t):
 
     V_x = []
     V_y = []
@@ -56,16 +55,13 @@ def calculate_optical_flow(I_x, I_y, I_t):
 
     return V_x, V_y
 
-
-if __name__ == '__main__':
-
-    region_size = 15
-
-    original_image, I_t0, I_t1 = load_images('Car1.jpg', 'Car2.jpg')
-
+def calculate_optical_flow_with_LK(name_image1='Car1.jpg', name_image2='Car2.jpg', region_size=15):
+    
+    I_t0, I_t1 = load_images(name_image1, name_image2)
+    
     I_x, I_y, I_t = calculate_derivatives(I_t0, I_t1)
 
-    h,w = I_t0.shape
+    h, w = I_t0.shape
 
     horizontal_subregions = h // region_size
     vertical_subregions = w // region_size
@@ -86,7 +82,7 @@ if __name__ == '__main__':
             sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
   
 
-    V_x, V_y = calculate_optical_flow(sub_I_x, sub_I_y, sub_I_t)
+    V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
     
     subregion_indices = []
     for i in range(horizontal_subregions):
@@ -97,11 +93,19 @@ if __name__ == '__main__':
 
     subregion_indices = np.array(subregion_indices)    
     
+    return subregion_indices, V_x, V_y
     
+if __name__ == '__main__':
+
+    original_image = cv2.imread('./images/Car1.jpg')
+    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    subregion_indices, V_x, V_y = calculate_optical_flow_with_LK()
     plt.figure()
     plt.imshow(original_image)
     plt.quiver(subregion_indices[:,0], subregion_indices[:,1], V_x, V_y, angles='xy', scale_units='xy', scale=0.1)
     plt.show()
+
+   
 
 
 
