@@ -30,28 +30,6 @@ def load_images(name_image_t0, name_image_t1):
 
     return  I_t0, I_t1
 
-def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
-
-    h, w = I_x.shape
-    horizontal_subregions = h // region_size
-    vertical_subregions = w // region_size
-    
-    # subregions = np.zeros(horizontal_subregions, vertical_subregions, horizontal_subregions * vertical_subregions)
-    sub_I_x = []
-    sub_I_y = []
-    sub_I_t = []
-    
-    for i in range(horizontal_subregions):
-        h_begin = i*region_size
-        h_end   = (i+1)*region_size
-        for j in range(vertical_subregions):
-            v_begin = j*region_size
-            v_end   = (j+1)*region_size
-            sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
-            sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
-            sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end])
-
-    return sub_I_x, sub_I_y, sub_I_t
 
 def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
 
