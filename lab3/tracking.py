@@ -15,8 +15,8 @@ def save_video(video_name, frames):
         video.write(frame)
 
 def update_corners(r, c, Vx, Vy):
-    r += Vy.astype(np.int)
-    c += Vx.astype(np.int)
+    r = np.round(r + Vy).astype(np.int32)
+    c = np.round(c + Vx).astype(np.int32)
     return r, c
 
 def tracking(path):
@@ -42,7 +42,7 @@ def tracking(path):
 
 
 if __name__ == '__main__':
-    path = './lab3/images/toy/'
+    path = './images/toy/'
     tracking(path)
 
 
