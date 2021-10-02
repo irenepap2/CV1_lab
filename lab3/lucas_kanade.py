@@ -39,7 +39,6 @@ def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
     sub_I_y = []
     sub_I_t = []
     
-    
     for i in range(horizontal_subregions):
         h_begin = i * region_size
         h_end   = (i + 1) * region_size
@@ -67,8 +66,6 @@ def calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size):
         sub_I_x.append(I_x[h_begin : h_end, v_begin : v_end])
         sub_I_y.append(I_y[h_begin : h_end, v_begin : v_end])
         sub_I_t.append(I_t[h_begin : h_end, v_begin : v_end]) 
-
-
 
     return sub_I_x, sub_I_y, sub_I_t
 
@@ -126,7 +123,6 @@ def calculate_optical_flow_with_LK_for_corners(name_image1, name_image2, image_p
     r = r[(r >= (region_size//2))]
     r = r[(c >= (region_size//2))]
     c = c[(c >= (region_size//2))]
-
     
     c = c[r <= h-(region_size//2)]
     r = r[r <= h-(region_size//2)]
