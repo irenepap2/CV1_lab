@@ -1,15 +1,16 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-from moviepy.video.io.bindings import mplfig_to_npimage
 from scipy import signal
 from scipy.ndimage.filters import maximum_filter
 from harris_corner_detector import *
 from lucas_kanade import calculate_optical_flow_with_LK_for_corners
 import os
 
-def save_video(video_name, frames, width, height):
-    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'DIVX'), 5, (width,height))
+def frames_to_video(video_name, frames):
+    f, height, width, c = frames.shape
+    fps = 5
+    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (width,height))
     
     for frame in frames:
         video.write(frame)
@@ -19,7 +20,7 @@ def update_corners(r, c, Vx, Vy):
     c = np.round(c + Vx).astype(np.int32)
     return r, c
 
-def tracking(path):
+def tracking(path, save_video = False):
     files = os.listdir(path)
     img = cv2.imread(os.path.join(path, files[0]), 0)
     height, width = img.shape
@@ -32,13 +33,15 @@ def tracking(path):
     plt.scatter(c, r, s=1, color='red')
     plt.axis("off")
     plt.pause(0.0001)
-    frame = mplfig_to_npimage(figure)
-    print(frame.shape)
-    # frame = np.frombuffer(figure.canvas.tostring_rgb(), dtype=np.uint8)
+    frame = np.frombuffer(figure.canvas.tostring_rgb(), dtype=np.uint8)
+    frame = np.reshape(frame, figure.canvas.get_width_height()[::-1] + (3,))
+    # create list with frames for final video
     frames = [frame]
     for i in range(1, len(files)):
         cur_img = cv2.imread(os.path.join(path, files[i]), 0)
+        # compute optical flow for initial corners (points of interest)
         subregion_indices, V_x, V_y, r, c = calculate_optical_flow_with_LK_for_corners(files[i-1], files[i], path, r, c) 
+        # update corner points based on V_x and V_y
         r, c = update_corners(r, c, V_x, V_y)
         plt.clf()
         plt.imshow(cur_img, cmap='gray')
@@ -46,17 +49,16 @@ def tracking(path):
         plt.draw()
         plt.axis("off")
         plt.pause(0.0001)
-        frame = mplfig_to_npimage(figure)
-        # frame = np.array(figure.canvas.renderer._renderer)
-        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # frame = np.frombuffer(figure.canvas.tostring_rgb(), dtype=np.uint8)
+        frame = np.frombuffer(figure.canvas.tostring_rgb(), dtype=np.uint8)
+        frame = np.reshape(frame, figure.canvas.get_width_height()[::-1]+(3,))
         frames.append(frame)
 
     frames = np.stack(frames)
-    save_video("output.avi", frames, width, height)
+    if (save_video):
+        frames_to_video("doll.avi", frames)
 
 if __name__ == '__main__':
-    path = './lab3/images/toy/'
-    tracking(path)
+    path = './images/doll/'
+    tracking(path, save_video = True)
 
 
