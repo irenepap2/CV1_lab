@@ -15,7 +15,7 @@ def get_corner_points(H, threshold):
     r, c = np.where(H - H_local_maxima == 0) 
     return r, c
 
-def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, window):   
+def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, window, plot=True):   
     # convert from uint8 to float32
     img = img.astype(np.float32) / 255
     
@@ -38,18 +38,20 @@ def harris_corner_detector(img, gauss_sigma, gauss_kernel_size, threshold, windo
     #compute corner points
     r,c  = get_corner_points(H, threshold)
 
-    plot_figures(img, Ix, Iy, H, r, c)
+    if plot:
+        plot_figures(img, Ix, Iy, H, r, c)
+        
     return H, r, c
 
 def plot_figures(img, Ix, Iy, H, r, c):   
     fig, (ix, iy, corners) = plt.subplots(1, 3, figsize=(12, 5))
-    ix.imshow(Ix)
+    ix.imshow(Ix, cmap='gray')
     ix.set_title('Gradient in x-direction')
     ix.set_axis_off()
-    iy.imshow(Iy)
+    iy.imshow(Iy, cmap='gray')
     iy.set_title('Gradient in y-direction')
     iy.set_axis_off()
-    corners.imshow(img)
+    corners.imshow(img, cmap='gray')
     corners.scatter(c, r, s=1, color='red')
     corners.set_title('Corners')
     corners.set_axis_off()

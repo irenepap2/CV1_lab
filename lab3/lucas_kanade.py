@@ -129,13 +129,13 @@ def calculate_optical_flow_with_LK_for_corners(name_image1, name_image2, image_p
     sub_I_x, sub_I_y, sub_I_t = calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size)
 
     V_x, V_y = calculate_flow_vectors(sub_I_x, sub_I_y, sub_I_t)
-        
+
     subregion_indices = np.array((c, r)).T
 
     V_x = np.array(V_x)
     V_y = np.array(V_y)    
-    
-    return subregion_indices, V_x, V_y
+
+    return subregion_indices, V_x, V_y, r, c
 
 if __name__ == '__main__':
 
