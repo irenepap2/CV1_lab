@@ -15,9 +15,9 @@ def frames_to_video(video_name, frames):
     for frame in frames:
         video.write(frame)
 
-def update_corners(r, c, Vx, Vy):
-    r = np.round(r + Vy).astype(np.int32)
-    c = np.round(c + Vx).astype(np.int32)
+def update_corners(r, c, Vx, Vy, scale_factor=3.25):
+    r = np.round(r + scale_factor*Vy).astype(np.int32)
+    c = np.round(c + scale_factor*Vx).astype(np.int32)
     return r, c
 
 def tracking(path, save_video = False):
@@ -45,7 +45,7 @@ def tracking(path, save_video = False):
         r, c = update_corners(r, c, V_x, V_y)
         plt.clf()
         plt.imshow(cur_img, cmap='gray')
-        plt.quiver(subregion_indices[:,0], subregion_indices[:,1], V_x, V_y, angles='xy', scale_units='xy', color='red')
+        plt.quiver(subregion_indices[:,0], subregion_indices[:,1], V_x, V_y, angles='xy', scale_units='xy', color='red', scale=0.03)
         plt.draw()
         plt.axis("off")
         plt.pause(0.0001)
@@ -55,10 +55,10 @@ def tracking(path, save_video = False):
 
     frames = np.stack(frames)
     if (save_video):
-        frames_to_video("doll.avi", frames)
+        frames_to_video("toy.avi", frames)
 
 if __name__ == '__main__':
-    path = './images/doll/'
+    path = './images/toy/'
     tracking(path, save_video = True)
 
 

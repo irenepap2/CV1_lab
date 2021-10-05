@@ -34,11 +34,11 @@ def calculate_subregions(I_t0, I_x, I_y, I_t, region_size):
     horizontal_subregions = h // region_size
     vertical_subregions = w // region_size
     
-    # subregions = np.zeros(horizontal_subregions, vertical_subregions, horizontal_subregions * vertical_subregions)
+
+    # Separate the image into sub_regions
     sub_I_x = []
     sub_I_y = []
     sub_I_t = []
-    
     for i in range(horizontal_subregions):
         h_begin = i * region_size
         h_end   = (i + 1) * region_size
@@ -55,6 +55,7 @@ def calculate_subregions_for_corners(I_x, I_y, I_t, r, c, region_size):
 
     number_of_points = r.shape[0]
 
+    # Find the indices of subregions with points of interest as their center
     sub_I_x = []
     sub_I_y = []
     sub_I_t = []
@@ -144,9 +145,9 @@ def calculate_optical_flow_with_LK_for_corners(name_image1, name_image2, image_p
 
 if __name__ == '__main__':
 
-    original_image = cv2.imread('./images/Car2.jpg')
+    original_image = cv2.imread('./images/Coke1.jpg')
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-    subregion_indices, V_x, V_y = calculate_optical_flow_with_LK()
+    subregion_indices, V_x, V_y = calculate_optical_flow_with_LK(name_image1='Coke1.jpg',name_image2='Coke2.jpg')
     plt.figure()
     plt.imshow(original_image)
     plt.quiver(subregion_indices[:,0], subregion_indices[:,1], V_x, V_y, angles='xy', scale_units='xy', scale=0.1)
