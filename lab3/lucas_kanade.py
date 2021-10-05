@@ -120,6 +120,8 @@ def calculate_optical_flow_with_LK_for_corners(name_image1, name_image2, image_p
 
     h, w = I_t0.shape
     
+    # Ignore corners where a subregion 
+    # (region_size * region_size) can't be created  
     c = c[(r >= (region_size//2))]
     r = r[(r >= (region_size//2))]
     r = r[(c >= (region_size//2))]
