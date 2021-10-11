@@ -13,9 +13,6 @@ def calculate_keypoint_matching(img1, img2):
     
     return kp1, kp2, des1, des2, matches
 
-
-
-
 if __name__ == '__main__':
     
     #load images
@@ -33,9 +30,9 @@ if __name__ == '__main__':
     #plot a random subset
     sample_matches = random.sample(matches, 10)
     match_img = cv.drawMatches(img1_gray, kp1, img2_gray, kp2, sample_matches, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    cv.imwrite('C:/Users/silav/Downloads/Lab4/Subset_matches.jpg', match_img)
-    #cv.imshow('Matching subset of size 10', match_img)
-    #cv.waitKey(0)
+    cv.imwrite('./Subset_matches.jpg', match_img)
+    cv.imshow('Matching subset of size 10', match_img)
+    cv.waitKey(0)
 
    
 
