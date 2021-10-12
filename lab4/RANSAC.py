@@ -7,7 +7,7 @@ from keypoint_matching import calculate_keypoint_matching
 
 
 def my_warp(original_img, transformation_params):
-    h, w, _ = original_img.shape
+    h, w = original_img.shape
     
     #first we create a grid to perform the coordinate wise transformation on
     initial_coordinates = np.indices((h, w)).T
@@ -18,7 +18,9 @@ def my_warp(original_img, transformation_params):
 
     #now we apply the transformation on the original grid
     new_coordinates = np.array(np.around((initial_coordinates @ np.linalg.inv(M).T) - translation[None,:]), dtype=np.int32)
-
+    
+    # new_coordinates = (transformation_params@np.vstack((initial_coordinates.T, np.ones((1,initial_coordinates.shape[0])))))[0:2]
+    # new_coordinates = new_coordinates.T.astype(np.int32)
     #find minimum and maximum x and y values to be able to fit the warped image into a picture frame
     min_x, max_x, min_y, max_y = np.inf, -np.inf, np.inf, -np.inf
     for i in range(len(new_coordinates)):
@@ -37,18 +39,18 @@ def my_warp(original_img, transformation_params):
         new_coordinates[j][1] = new_coordinates[j][1] - min_y
 
     
-    new_im = np.ones((max_x-min_x+1, max_y-min_y+1, 3)) * -1
-    new_im[new_coordinates[:,0], new_coordinates[:,1], :] = original_img[initial_coordinates[:,0], initial_coordinates[:,1], :]
-    new_h, new_w, _ = new_im.shape
+    new_im = np.ones((max_x-min_x+1, max_y-min_y+1)) * -1
+    new_im[new_coordinates[:,0], new_coordinates[:,1]] = original_img[initial_coordinates[:,0], initial_coordinates[:,1]]
+    new_h, new_w = new_im.shape
     for i in range(new_h):
         for j in range(new_w):
-            if new_im[i,j,0]<0:
-                end = j+8
+            if new_im[i,j]<0:
+                end = j+10
                 if end > new_w-1:
                     end= new_w-1
-                num_of_missing = sum(new_im[i,j:end,0]<0)
-                if j>0 and num_of_missing<8:
-                    new_im[i,j,:] = new_im[i,j-1,:] 
+                num_of_missing = sum(new_im[i,j:end]<0)
+                if j>0 and num_of_missing<10:
+                    new_im[i,j] = new_im[i,j-1] 
 
     return new_im
 
@@ -71,12 +73,11 @@ def AffineTransformation(stackofpoints):
 
 
 def RANSAC(corr, thresh):
-    N = 1500
+    N = 1000
     P = 10
     max_inliers = -1
     #Repeat N times (selected 1000)
     for i in range(N):
-        #Pick P matches at random from the total set of matches T (selected 6)
         for i in range(P):
             corr[i] = corr[random.randrange(0, len(corr))]
             if i == 0: 
@@ -87,11 +88,10 @@ def RANSAC(corr, thresh):
                 stackofpoints = np.vstack((stackofpoints, corr[i]))
         affine = AffineTransformation(stackofpoints)
 
+        im2_points = corr[:,2:4].T
         im1_points = []
-        im2_points = stackofpoints[:,2:4].T
-        
-        for i in range(len(stackofpoints)):
-            im1_points.append([stackofpoints[i, 0], stackofpoints[i, 1], 1])
+        for i in range(len(corr)):
+            im1_points.append([corr[i,0], corr[i, 1], 1])
 
         # transform first image points
         transformed_points = (affine @ np.array(im1_points).T)[:2]
@@ -103,11 +103,10 @@ def RANSAC(corr, thresh):
         if (inliers > max_inliers):
             max_inliers = inliers
             best_solution = np.copy(affine)
-            if max_inliers == P:
-                break
+            
 
           
-    
+    print('MAX inliers found:',max_inliers)
     return best_solution
 
 
@@ -146,26 +145,26 @@ if __name__ == '__main__':
     
     # transformed_points = (P @ np.array(im1_points).T)[:2]
     h, w = image_right_gray.shape
-    image1_cvwarp = cv.warpAffine(image_right,P[0:2,:],(w,h))
-    image1_mywarp = my_warp(image_right, P)
+    image1_cvwarp = cv.warpAffine(image_right_gray,P[0:2,:],(w,h))
+    image1_mywarp = my_warp(image_right_gray, P)
     
     h, w = image_left_gray.shape
     new_P = np.linalg.inv(P)
-    image2_cvwarp = cv.warpAffine(image_left, new_P[0:2,:], (w,h))
-    image2_mywarp = my_warp(image_left, new_P)
+    image2_cvwarp = cv.warpAffine(image_left_gray, new_P[0:2,:], (w,h))
+    image2_mywarp = my_warp(image_left_gray, new_P)
 
-   
+    print()
     fig=plt.figure(figsize=(20,30))
     plt.subplot(2, 3, 1)
     plt.imshow(image_right)
     plt.axis('off')
     plt.title('Original image 1', fontsize=22)
     plt.subplot(2, 3, 2)
-    plt.imshow(image1_cvwarp)
+    plt.imshow(image1_cvwarp, vmin=0, vmax=255, cmap='gray')
     plt.axis('off')
     plt.title('image 1 to image 2 using openCV warp function', fontsize=22)
     plt.subplot(2, 3, 3)
-    plt.imshow(image1_mywarp)
+    plt.imshow(image1_mywarp, vmin=0, vmax=255, cmap='gray')
     plt.axis('off')
     plt.title('image 1 to image 2 using our warp function', fontsize=22)
     plt.subplot(2, 3, 4)
@@ -173,11 +172,11 @@ if __name__ == '__main__':
     plt.axis('off')
     plt.title('Original image 2', fontsize=22)
     plt.subplot(2, 3, 5)
-    plt.imshow(image2_cvwarp)
+    plt.imshow(image2_cvwarp, vmin=0, vmax=255, cmap='gray')
     plt.axis('off')
     plt.title('image 2 to image 1 using openCV warp function', fontsize=22)
     plt.subplot(2, 3, 6)
-    plt.imshow(image2_mywarp)
+    plt.imshow(image2_mywarp, vmin=0, vmax=255, cmap='gray')
     plt.axis('off')
     plt.title('image 2 to image 1 using our warp function', fontsize=22)
     
