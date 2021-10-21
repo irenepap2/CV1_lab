@@ -17,8 +17,6 @@ try:
 except:
     from scipy.misc import imsave
 
-print(sys.version_info) 
-
 # image shape
 HEIGHT = 96
 WIDTH = 96
